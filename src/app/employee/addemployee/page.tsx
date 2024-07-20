@@ -1,10 +1,51 @@
 "use client" // use client 👉 For Client Component
 
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
+
 
 
 const AddEmployee = () => {
+
+    const [employee, setEmployee] = useState({
+        name: "",
+        email: "",
+        address: "",
+        salary: ""
+    })
+
+    
+
+    const addEmployeeDetails = async () => {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/employee`, {
+            method: 'POST',
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify(employee)
+        })
+
+        const data = await res.json();
+
+        // Destructure Data 
+        const { message, error } = data;
+
+        // Condition 
+        if (error) {
+            alert(error) // Error Message
+        } else {
+            alert(message) // Success Message
+            setEmployee({
+                name: "",
+                email: "",
+                address: "",
+                salary: ""
+            })
+        }
+
+    }
+
+
     return (
         <div className=' container mx-auto flex justify-center items-center h-screen'>
             {/* Main  */}
@@ -37,6 +78,11 @@ const AddEmployee = () => {
                             type="text"
                             name='employeeName'
                             placeholder='Enter name'
+                            value={employee.name}
+                            onChange={(e) => setEmployee({
+                                ...employee,
+                                name: e.target.value
+                            })}
                             className='border border-gray-400 hover:border-gray-700 w-96 px-1.5 py-1.5 rounded-md outline-none mb-5 placeholder-gray-400'
                         />
                     </div>
@@ -47,6 +93,11 @@ const AddEmployee = () => {
                             type="email"
                             name='employeeEmail'
                             placeholder='Enter email'
+                            value={employee.email}
+                            onChange={(e) => setEmployee({
+                                ...employee,
+                                email: e.target.value
+                            })}
                             className='border border-gray-400 hover:border-gray-700 w-96 px-1.5 py-1.5 rounded-md outline-none mb-5 placeholder-gray-400'
                         />
                     </div>
@@ -57,6 +108,11 @@ const AddEmployee = () => {
                             type="text"
                             name='employeeAddress'
                             placeholder='Enter address'
+                            value={employee.address}
+                            onChange={(e) => setEmployee({
+                                ...employee,
+                                address: e.target.value
+                            })}
                             className='border border-gray-400 hover:border-gray-700 w-96 px-1.5 py-1.5 rounded-md outline-none mb-5 placeholder-gray-400'
                         />
                     </div>
@@ -67,6 +123,11 @@ const AddEmployee = () => {
                             type="number"
                             name='employeeSalary'
                             placeholder='Enter salary'
+                            value={employee.salary}
+                            onChange={(e) => setEmployee({
+                                ...employee,
+                                salary: e.target.value
+                            })}
                             className='border border-gray-400 hover:border-gray-700 w-96 px-1.5 py-1.5 rounded-md outline-none mb-8 placeholder-gray-400'
                         />
                     </div>
@@ -74,9 +135,17 @@ const AddEmployee = () => {
                     {/* Add Button  */}
                     <div>
                         <button
+                            onClick={addEmployeeDetails}
                             className=' bg-gray-100 hover:bg-gray-200 w-full py-1.5 border border-gray-400 rounded-md font-medium mb-5'>
                             Add Detail
                         </button>
+
+                        <Link href={"/employee/employeeList"}>
+
+                            <button className=' bg-gray-100 hover:bg-gray-200 w-full py-1.5 border border-gray-400 rounded-md font-medium mb-5'
+                            >View List</button>
+                        </Link>
+                        
                     </div>
                 </div>
             </div>

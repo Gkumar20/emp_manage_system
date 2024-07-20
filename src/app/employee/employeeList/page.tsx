@@ -1,9 +1,59 @@
 "use client" // use client 👉 For Client Component
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 const EmployeeList = () => {
-  
+
+    const [employee, setEmployee] = useState([]);
+
+    const getEmployeeList = async () => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/employee`, {
+                method: "GET",
+                headers: {
+                    'content-type': "application/json"
+                }
+            })
+
+            const data = await res.json();
+            console.log(data);
+            setEmployee(data);
+        } catch (error) {
+            console.log("Error is: ", error);
+        }
+    }
+
+
+    // Delete Employee Function 
+    const deleteEmployee = async (_id: string) => {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/employee/${_id}`, {
+            method: 'DELETE'
+        })
+
+        // Create Data 
+        const data = await res.json();
+        // console.log(data)
+
+        // Destructure data
+        const { message, error } = data
+
+        // Condition
+        if (error) {
+            alert(error) // Error Message
+        }
+        else {
+            alert(message) // Success Message
+        }
+
+        getEmployeeList(); // Call GetEmployeeList Function
+    }
+
+
+    useEffect(() => {
+        getEmployeeList();
+    }, [])
+
     return (
         <div className=' flex justify-center items-center h-screen'>
             {/* Main  */}
@@ -92,50 +142,65 @@ const EmployeeList = () => {
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-200">
-                                    <tr>
-                                        {/* S.No  */}
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 ">
-                                            1.
-                                        </td>
+                                {employee.map((item, index) => {
+                                    const { _id, name, email, address, salary } = item;
+                                    return (
+                                        <tbody key={index} className="divide-y divide-gray-200">
+                                            <tr>
+                                                {/* S.No  */}
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 ">
+                                                    {index + 1}.
+                                                </td>
 
-                                        {/* Name  */}
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 ">
-                                            Kamal Nayan Upadhyay
-                                        </td>
+                                                {/* Name  */}
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 ">
+                                                    {name}
+                                                </td>
 
-                                        {/* Email  */}
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 ">
-                                            kamal@gmail.com
-                                        </td>
+                                                {/* Email  */}
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 ">
+                                                    {email}
+                                                </td>
 
-                                        {/* Address  */}
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 ">
-                                            Bihar
-                                        </td>
+                                                {/* Address  */}
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 ">
+                                                    {address}
+                                                </td>
 
-                                        {/* Salary  */}
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 ">
-                                            ₹ 1000000
-                                        </td>
+                                                {/* Salary  */}
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 ">
+                                                    ₹ {salary}
+                                                </td>
 
-                                        {/* Edit Button */}
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <Link href={'/employee/employeeId'} className="text-green-600">
-                                                Edit
-                                            </Link>
-                                        </td>
+                                                {/* Edit Button */}
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                    <Link href={_id} className="text-green-600">
+                                                        Edit
+                                                    </Link>
+                                                </td>
 
-                                        {/* Delete Button */}
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <div className="text-red-600 cursor-pointer " >
-                                                Delete
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                                {/* Delete Button */}
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                    <div
+                                                        onClick={() => {
+                                                            deleteEmployee(_id)
+                                                        }}
+                                                        className="text-red-600 cursor-pointer " >
+                                                        Delete
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    )
+                                })}
                             </table>
+
                         </div>
+                            <Link href={"/employee/addemployee"}>
+
+                                <button className=' bg-gray-100 hover:bg-gray-200 w-full py-1.5 border border-gray-400 rounded-md font-medium mb-5 mt-5'
+                                >Add More Employee</button>
+                            </Link>
                     </div>
                 </div>
             </div>
